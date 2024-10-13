@@ -1,14 +1,37 @@
-import base64
+import os
+import sys
+import logging
 from flask import Flask, render_template, request
-import vertexai
-import markdown
-from vertexai.generative_models import GenerativeModel
-import vertexai.preview.generative_models as generative_models
+import vertexai  # type: ignore
+import markdown  # type: ignore
+from vertexai.generative_models import GenerativeModel  # type: ignore
+import vertexai.preview.generative_models as generative_models  # type: ignore
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Configure logging
+LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO').upper()
+logging.basicConfig(level=LOG_LEVEL)
+
+PROJECT_ID = os.getenv('PROJECT_ID')
+REGION = os.getenv('REGION')
+
+if not PROJECT_ID:
+    logging.error("PROJECT_ID environment variable is not set")
+    sys.exit(1)
+if not REGION:
+    logging.error("REGION environment variable is not set")
+    sys.exit(1)
+
+MODEL_NAME = os.getenv('MODEL_NAME', 'gemini-1.5-pro-001')
 
 app = Flask(__name__)
 
-vertexai.init(project="YOUR-PROJECT-ID", location="YOUR-REGION")
-model = GenerativeModel("gemini-1.5-pro-001")
+vertexai.init(project=PROJECT_ID, location=REGION)
+
+model = GenerativeModel(MODEL_NAME)
 
 generation_config = {
     "max_output_tokens": 8192,
@@ -22,6 +45,7 @@ safety_settings = {
     generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
     generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
 }
+
 
 @app.route("/", methods=["GET", "POST"])
 def index():
