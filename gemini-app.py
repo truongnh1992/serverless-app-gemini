@@ -30,6 +30,7 @@ def index():
         prompt = request.form["prompt"]
         response = model.generate_content(prompt, generation_config=generation_config, safety_settings=safety_settings)
         response_text = markdown.markdown(response.text)  # Convert response to markdown
+    print("Test my GH action")
     return render_template("index-with-css.html", response_text=response_text)
 
 
