@@ -1,0 +1,23 @@
+name: Gemini AI Code Reviewer
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+permissions: write-all
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Gemini AI Code Reviewer
+        uses: truongnh1992/gemini-ai-code-reviewer@v3.0.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          exclude: "**/*.json, **/*.md" # Optional: exclude patterns separated by commas
+        volumes:
+          - /github/workspace:/app
